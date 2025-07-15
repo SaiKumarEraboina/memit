@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
-
 class TrimmerView extends StatefulWidget {
   final File file;
 
@@ -32,22 +31,21 @@ class _TrimmerViewState extends State<TrimmerView> {
   }
 
   void _saveVideo() {
-  setState(() {
-    _progressVisibility = true;
-  });
+    setState(() {
+      _progressVisibility = true;
+    });
 
-  _trimmer.saveTrimmedVideo(
-    startValue: _startValue,
-    endValue: _endValue,
-    onSave: (outputPath) {
-      setState(() => _progressVisibility = false);
-      debugPrint('OUTPUT PATH: $outputPath');
+    _trimmer.saveTrimmedVideo(
+      startValue: _startValue,
+      endValue: _endValue,
+      onSave: (outputPath) {
+        setState(() => _progressVisibility = false);
+        debugPrint('OUTPUT PATH: $outputPath');
 
-      Navigator.pop(context, outputPath); // ⬅️ send the path back
-    },
-  );
-}
-
+        Navigator.pop(context, outputPath); // ⬅️ send the path back
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +55,12 @@ class _TrimmerViewState extends State<TrimmerView> {
         backgroundColor: Colors.black,
         appBar: AppBar(
           title: const Text('Video Trimmer'),
+          actions: [
+            IconButton(
+              onPressed: _progressVisibility ? null : () => _saveVideo(),
+              icon: Icon(Icons.check),
+            ),
+          ],
         ),
         body: Center(
           child: Container(
@@ -71,13 +75,8 @@ class _TrimmerViewState extends State<TrimmerView> {
                     backgroundColor: Colors.red,
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: _progressVisibility ? null : () => _saveVideo(),
-                  child: const Text('SAVE'),
-                ),
-                Expanded(
-                  child: VideoViewer(trimmer: _trimmer),
-                ),
+
+                Expanded(child: VideoViewer(trimmer: _trimmer)),
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -98,23 +97,24 @@ class _TrimmerViewState extends State<TrimmerView> {
                       ),
                       onChangeStart: (value) => _startValue = value,
                       onChangeEnd: (value) => _endValue = value,
-                      onChangePlaybackState: (value) =>
-                          setState(() => _isPlaying = value),
+                      onChangePlaybackState:
+                          (value) => setState(() => _isPlaying = value),
                     ),
                   ),
                 ),
                 TextButton(
-                  child: _isPlaying
-                      ? const Icon(
-                          Icons.pause,
-                          size: 80.0,
-                          color: Colors.white,
-                        )
-                      : const Icon(
-                          Icons.play_arrow,
-                          size: 80.0,
-                          color: Colors.white,
-                        ),
+                  child:
+                      _isPlaying
+                          ? const Icon(
+                            Icons.pause,
+                            size: 80.0,
+                            color: Colors.white,
+                          )
+                          : const Icon(
+                            Icons.play_arrow,
+                            size: 80.0,
+                            color: Colors.white,
+                          ),
                   onPressed: () async {
                     bool playbackState = await _trimmer.videoPlaybackControl(
                       startValue: _startValue,
@@ -122,7 +122,7 @@ class _TrimmerViewState extends State<TrimmerView> {
                     );
                     setState(() => _isPlaying = playbackState);
                   },
-                )
+                ),
               ],
             ),
           ),

@@ -1,6 +1,5 @@
 // This version replaces helper widget functions with separate widget classes for clarity.
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:memit/common_widgets/responsive_scrollable_card.dart';
 import 'package:memit/features/create_memes/presentation/pick_image_for_collage_screen.dart';
 import 'package:memit/features/create_memes/presentation/select_image_source.dart';

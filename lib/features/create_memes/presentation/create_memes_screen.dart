@@ -28,7 +28,6 @@ class CreateMemesScreen extends StatelessWidget {
               InkWell(
                 onTap: ()=>
                 context.push(AppRoutes.collageCatalogue),
-                // Navigator.of(context).push(MaterialPageRoute(builder: (context) => CollageCatalogueScreen(),)),
                 child: Container(
                   width: double.infinity,
                   height: 200,
@@ -38,10 +37,8 @@ class CreateMemesScreen extends StatelessWidget {
                     color: const Color(0xFFE8F3FF),
                   ),
                   child: Column(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center, // Vertically center
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center, // Horizontally center
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment:CrossAxisAlignment.center,
                     children: [
                       SvgPicture.asset(
                         'assets/icons/add_circle.svg',
