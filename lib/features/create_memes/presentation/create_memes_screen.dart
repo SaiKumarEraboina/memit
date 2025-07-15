@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memit/common_widgets/responsive_scrollable_card.dart';
-import 'package:memit/features/create_memes/presentation/collage_catalogue_screen.dart';
 import 'package:memit/features/create_memes/presentation/template.dart';
+import 'package:memit/routing/app_routes.dart';
 
 
 class CreateMemesScreen extends StatelessWidget {
@@ -21,11 +22,13 @@ class CreateMemesScreen extends StatelessWidget {
                 child: Text(
                   'Create Meme',
                   style: Theme.of(context).textTheme.titleMedium,
-                ),
+                )
               ),
               const SizedBox(height: 16),
               InkWell(
-                onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context) => CollageCatalogueScreen(),)),
+                onTap: ()=>
+                context.push(AppRoutes.collageCatalogue),
+                // Navigator.of(context).push(MaterialPageRoute(builder: (context) => CollageCatalogueScreen(),)),
                 child: Container(
                   width: double.infinity,
                   height: 200,
@@ -133,7 +136,7 @@ class CreateMemesScreen extends StatelessWidget {
                           templateDescription: 'Light-hearted and fun memes',
                         ),
                       ),
-                      SizedBox(width: 12),
+                      SizedBox(width: 12),  
                       Expanded(
                         child: Template(
                           image: 'game',

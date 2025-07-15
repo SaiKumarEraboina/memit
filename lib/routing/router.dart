@@ -1,35 +1,34 @@
 import 'package:go_router/go_router.dart';
 import 'package:memit/common_widgets/custom_bottom_navigation.dart';
+import 'package:memit/features/create_memes/presentation/collage_catalogue_screen.dart';
 import 'package:memit/features/create_memes/presentation/create_memes_screen.dart';
 import 'package:memit/features/explore/explore_screen.dart';
 import 'package:memit/features/home/presentation/home_screen.dart';
 import 'package:memit/features/notifications/presentation/notifications_screen.dart';
 import 'package:memit/features/profile/profile_screen.dart';
+import 'package:memit/routing/app_routes.dart';
 
 final goRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: AppRoutes.home,
   routes: [
+
+    /// ✅ Standalone screen outside bottom navigation shell
+    GoRoute(
+      path: AppRoutes.collageCatalogue,
+      builder: (context, state) => const CollageCatalogueScreen(),
+    ),
+
+
     StatefulShellRoute.indexedStack(
       builder: (context, state, shell) => CustomBottomNavigation(shell: shell),
       branches: [
-        StatefulShellBranch(
-          routes: [
-            GoRoute(path: "/", builder: (context, state) => HomeScreen()),
-          ],
-        ),
+
+
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: "/explore",
-              builder: (context, state) => ExploreScreen(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: "/create-memes",
-              builder: (context, state) => CreateMemesScreen(),
+              path: AppRoutes.home,
+              builder: (context, state) => const HomeScreen(),
             ),
           ],
         ),
@@ -37,16 +36,37 @@ final goRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: "/notifications",
-              builder: (context, state) => NotificationScreen(),
+              path: AppRoutes.explore,
+              builder: (context, state) => const ExploreScreen(),
             ),
           ],
         ),
+
+
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: "/profile",
-              builder: (context, state) => ProfileScreen(),
+              path: AppRoutes.createMemes,
+              builder: (context, state) => const CreateMemesScreen(),
+            ),
+          ],
+        ),
+
+
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.notifications,
+              builder: (context, state) => const NotificationScreen(),
+            ),
+          ],
+        ),
+
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.profile,
+              builder: (context, state) => const ProfileScreen(),
             ),
           ],
         ),
