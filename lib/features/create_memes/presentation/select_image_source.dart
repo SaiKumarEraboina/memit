@@ -19,29 +19,30 @@ class _SelectMediaFromSourceState extends State<SelectMediaFromSource> {
     super.dispose();
   }
 
+  void _handleTap(BuildContext context) {
+    if (controller.hasMedia) {
+      controller.openEditor(context).then((_) => setState(() {}));
+    } else {
+      controller.showAddDialog(
+        context,
+        onUpdate: () => setState(() {}),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        if (controller.hasMedia) {
-          controller.openEditor(context).then((_) => setState(() {}));
-        } else {
-          controller.showAddDialog(context, onUpdate: () => setState(() {}));
-        }
-      },
-      child:
-          controller.hasNoMedia
-              ? const SizedBox.expand(
-                // 🔁 Fix: makes AddMediaButton tappable
-                child: AddMediaButton(),
-              )
-              : MediaViewer(
-                isVideo: controller.isVideo,
-                videoController: controller.videoController,
-                imageFile: controller.selectedFile,
-                webImageBytes: controller.webImageBytes,
-                onTap: () => controller.openEditor(context),
-              ),
+      onTap: () => _handleTap(context),
+      child: controller.hasNoMedia
+          ? const AddMediaButton()
+          : MediaViewer(
+              isVideo: controller.isVideo,
+              videoController: controller.videoController,
+              imageFile: controller.selectedFile,
+              webImageBytes: controller.webImageBytes,
+              onTap: () => controller.openEditor(context),
+            ),
     );
   }
 }

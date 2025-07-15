@@ -1,7 +1,6 @@
-// 📁 media_viewer.dart
 
 import 'dart:io';
-
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -25,6 +24,7 @@ class MediaViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isVideo) {
+      // Display video inside zoomable viewer
       if (videoController != null && videoController!.value.isInitialized) {
         return InteractiveViewer(
           panEnabled: true,
@@ -40,6 +40,7 @@ class MediaViewer extends StatelessWidget {
         return const Center(child: CircularProgressIndicator());
       }
     } else {
+      // Display image (from web or local)
       return InteractiveViewer(
         panEnabled: true,
         scaleEnabled: true,
@@ -47,10 +48,9 @@ class MediaViewer extends StatelessWidget {
         maxScale: 4.0,
         child: GestureDetector(
           onTap: onTap,
-          child:
-              kIsWeb
-                  ? Image.memory(webImageBytes!, fit: BoxFit.cover)
-                  : Image.file(imageFile!, fit: BoxFit.cover),
+          child: kIsWeb
+              ? Image.memory(webImageBytes!, fit: BoxFit.cover)
+              : Image.file(imageFile!, fit: BoxFit.cover),
         ),
       );
     }
