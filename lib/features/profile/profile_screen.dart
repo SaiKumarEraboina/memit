@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memit/common_widgets/responsive_scrollable_card.dart';
 import 'package:memit/features/profile/posts_grid.dart';
 import 'package:memit/features/profile/profile_header.dart';
 import 'package:memit/features/profile/tabbar_section.dart';
+import 'package:memit/routing/app_routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -32,23 +35,56 @@ class ProfileScreen extends StatelessWidget {
               icon: Icon(Icons.check_circle_outline_outlined),
             ),
             IconButton(onPressed: () {}, icon: Icon(Icons.settings)),
+            IconButton(
+              onPressed: () {
+                confirmLogout(context);
+              },
+              icon: Icon(Icons.logout),
+            ),
           ],
         ),
-        body:  ResponsiveScrollableCard(
+        body: ResponsiveScrollableCard(
           child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                ProfileHeaderSection(),
-                TabBarSection(),
-                SizedBox(height: 20),
-                SizedBox(
-                  height: 500, // 👈 Add a fixed height
-                  child: PostsGridSection(),
-                ),
-              ],
-            ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              ProfileHeaderSection(),
+              TabBarSection(),
+              SizedBox(height: 20),
+              SizedBox(
+                height: 500, // 👈 Add a fixed height
+                child: PostsGridSection(),
+              ),
+            ],
+          ),
         ),
-        ),
-      );
+      ),
+    );
+  }
+
+  void confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('Confirm Logout'),
+            content: const Text('Are you sure you want to log out?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(), // Close the dialog
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  context.pop();
+                  FirebaseAuth.instance.signOut();
+                  context.go(AppRoutes.auth);
+                  // Perform logout logic here
+                  // FirebaseAuth.instance.signOut();
+                },
+                child: const Text('Logout'),
+              ),
+            ],
+          ),
+    );
   }
 }

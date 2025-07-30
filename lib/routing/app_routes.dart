@@ -1,5 +1,6 @@
 class AppRoutes {
   static const home = '/';
+  static const auth = '/auth';
   static const explore = '/explore';
   static const createMemes = '/create-memes';
   static const notifications = '/notifications';
