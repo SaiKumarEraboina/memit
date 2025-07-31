@@ -1,8 +1,11 @@
 // This version replaces helper widget functions with separate widget classes for clarity.
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memit/common_widgets/responsive_scrollable_card.dart';
+import 'package:memit/constants/constants.dart';
 import 'package:memit/features/create_memes/presentation/pick_image_for_collage_screen.dart';
 import 'package:memit/features/create_memes/presentation/select_image_source.dart';
+import 'package:memit/routing/app_routes.dart';
 
 class CollageCatalogueScreen extends StatelessWidget {
   const CollageCatalogueScreen({super.key});
@@ -58,14 +61,14 @@ class HorizontalDivider extends StatelessWidget {
   const HorizontalDivider({super.key});
   @override
   Widget build(BuildContext context) =>
-      const Divider(height: 0.5, thickness: 0.5, color: Colors.grey);
+      const Divider(height: 0.5, thickness: 1, color: Colors.grey);
 }
 
 class VerticalDividerWidget extends StatelessWidget {
   const VerticalDividerWidget({super.key});
   @override
   Widget build(BuildContext context) =>
-      const VerticalDivider(width: 0.5, thickness: 0.5, color: Colors.grey);
+      const VerticalDivider(width: 0.5, thickness: 1, color: Colors.grey);
 }
 
 class CollageWrapper extends StatelessWidget {
@@ -102,19 +105,11 @@ class Collage1 extends StatelessWidget {
   const Collage1({super.key});
   @override
   Widget build(BuildContext context) {
-    return CollageWrapper(
-      height: 200,
-      builder:
-          (ctx, showIcons) => Column(
-            children: [
-              Expanded(
-                child:
-                    showIcons
-                        ? const SelectMediaFromSource()
-                        : const SizedBox(),
-              ),
-            ],
-          ),
+    return GestureDetector(
+      onTap: () {
+        context.push(AppRoutes.fileInputScreen, extra: CollageType.single);
+      },
+      child: Card(color: Colors.white, child: SizedBox(height: 200)),
     );
   }
 }
@@ -123,26 +118,23 @@ class Collage2 extends StatelessWidget {
   const Collage2({super.key});
   @override
   Widget build(BuildContext context) {
-    return CollageWrapper(
-      height: 200,
-      builder:
-          (ctx, showIcons) => Column(
+    return GestureDetector(
+      onTap: () {
+        context.push(AppRoutes.fileInputScreen, extra: CollageType.halfSplit);
+      },
+      child: SizedBox(
+        height: 200,
+        child: Card(
+          color: Colors.white,
+          child: Column(
             children: [
-              Expanded(
-                child:
-                    showIcons
-                        ? const SelectMediaFromSource()
-                        : const SizedBox(),
-              ),
-              const HorizontalDivider(),
-              Expanded(
-                child:
-                    showIcons
-                        ? const SelectMediaFromSource()
-                        : const SizedBox(),
-              ),
+              Expanded(child: SizedBox()),
+              HorizontalDivider(),
+              Expanded(child: SizedBox()),
             ],
           ),
+        ),
+      ),
     );
   }
 }

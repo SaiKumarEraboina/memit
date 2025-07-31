@@ -6,6 +6,8 @@ class AppRoutes {
   static const notifications = '/notifications';
   static const profile = '/profile';
   static const collageCatalogue = '/collage-catalogue-screen';
+  static const memeDataScreen = '/meme-data-screen';
+  static const fileInputScreen = '/fileInputScreen';
 
   static const bottomNavRoutes = [
     home,

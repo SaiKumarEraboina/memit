@@ -2,9 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memit/common_widgets/custom_bottom_navigation.dart';
+import 'package:memit/constants/constants.dart';
 import 'package:memit/features/auth/authentication_screen.dart';
 import 'package:memit/features/create_memes/presentation/collage_catalogue_screen.dart';
 import 'package:memit/features/create_memes/presentation/create_memes_screen.dart';
+import 'package:memit/features/create_memes/presentation/file_input_screen.dart';
+import 'package:memit/features/create_memes/presentation/meme_data_screen.dart';
 import 'package:memit/features/explore/explore_screen.dart';
 import 'package:memit/features/home/presentation/home_screen.dart';
 import 'package:memit/features/notifications/presentation/notifications_screen.dart';
@@ -26,6 +29,19 @@ final goRouter = GoRouter(
     GoRoute(
       path: AppRoutes.collageCatalogue,
       builder: (context, state) => const CollageCatalogueScreen(),
+    ),
+
+    GoRoute(
+      path: AppRoutes.memeDataScreen,
+      builder:
+          (context, state) => MemeDataScreen(imagePath: state.extra as String?),
+    ),
+
+    GoRoute(
+      path: AppRoutes.fileInputScreen,
+      builder:
+          (context, state) =>
+              FileInputScreen(collageType: state.extra as CollageType?),
     ),
 
     GoRoute(

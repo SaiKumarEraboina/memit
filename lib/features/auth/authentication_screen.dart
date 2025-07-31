@@ -52,6 +52,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         userCredential = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
+          
         );
 
         await userCredential.user!.sendEmailVerification();
