@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-class MemeBody extends StatelessWidget { 
+class MemeBody extends StatelessWidget {
   final String postUrl;
+
   const MemeBody({super.key, required this.postUrl});
 
   @override
@@ -9,12 +11,22 @@ class MemeBody extends StatelessWidget {
     return Stack(
       children: [
         ClipRRect(
-          child: Image.network(
-            postUrl,
+          child: CachedNetworkImage(
+            imageUrl: postUrl,
             fit: BoxFit.cover,
-            // height: 250,
-            width: double.infinity, 
-            errorBuilder: (context, error, stackTrace) => Image.asset('assets/images/image_not_found.png'),
+            width: double.infinity,
+            placeholder:
+                (context, url) => Container(
+                  width: double.infinity,
+                  height: 250,
+                  color: Colors.grey[300],
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+            errorWidget:
+                (context, url, error) => Image.asset(
+                  'assets/images/image_not_found.png',
+                  fit: BoxFit.cover,
+                ),
           ),
         ),
         Positioned(
@@ -43,4 +55,3 @@ class MemeBody extends StatelessWidget {
     );
   }
 }
-

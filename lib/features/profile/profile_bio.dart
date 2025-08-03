@@ -1,20 +1,27 @@
-
 import 'package:flutter/material.dart';
+import 'package:memit/features/profile/models/profile_model.dart';
 
 class ProfileBioSection extends StatelessWidget {
-  const ProfileBioSection({super.key});
+  final ProfileModel profile;
+  const ProfileBioSection({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Align(
-        alignment: Alignment.center,
-        child: Text( 
-          "Shiva\n flutter_world"
-          "Flutter Dev 🚀\nLove coding and coffee ☕",
-          style: TextStyle(fontSize: 14,),textAlign: TextAlign.center,
-        ),
+      child: Column(
+        children: [
+          Text(
+            profile.name ?? 'Memit User',
+            style: TextStyle(fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+          Text(
+            profile.bio ?? '',
+            style: TextStyle(fontSize: 14),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

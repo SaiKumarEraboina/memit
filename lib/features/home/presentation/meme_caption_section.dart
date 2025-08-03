@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class MemeCaptionSection extends StatelessWidget {
   final int views;
-  final int timeAgo;
+  final String timeAgo;
   final List<String> hashtags;
   final String description;
 
@@ -21,7 +21,7 @@ class MemeCaptionSection extends StatelessWidget {
       // mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Text(
-          "• ${views.toString()} Views• $timeAgo hours ago",
+          "• ${views.toString()} Views• $timeAgo ",
           style: const TextStyle(color: Colors.grey),
         ),
         Column(

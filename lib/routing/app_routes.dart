@@ -8,6 +8,7 @@ class AppRoutes {
   static const collageCatalogue = '/collage-catalogue-screen';
   static const memeDataScreen = '/meme-data-screen';
   static const fileInputScreen = '/fileInputScreen';
+  static const editProfile = '/edit-profile';
 
   static const bottomNavRoutes = [
     home,

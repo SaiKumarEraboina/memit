@@ -4,4 +4,5 @@ class FirebaseCollections {
   static String likes = 'likes';
   static String users = 'users';
   static String memes = 'memes';
+
 }

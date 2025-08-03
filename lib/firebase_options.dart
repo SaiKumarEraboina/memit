@@ -50,20 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAI-PnvgRyip0V42MjjGyU3pWpBbW3sJI0',
-    appId: '1:426668685640:android:bb454eef3cd4d6cd631b7d',
-    messagingSenderId: '426668685640',
-    projectId: 'social-app-test-62971',
-    storageBucket: 'social-app-test-62971.appspot.com',
+    apiKey: 'AIzaSyAwRAy3YjfH6w0EK1Ekj-0adwfsQbvfNgg',
+    appId: '1:225404424962:android:f2b73a160824079a53281b',
+    messagingSenderId: '225404424962',
+    projectId: 'memit-8f897',
+    storageBucket: 'memit-8f897.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCTMwkmnsZCvEKre9D6nIBzZYJvy8pTtoE',
-    appId: '1:426668685640:ios:2d0c86119bb328fd631b7d',
-    messagingSenderId: '426668685640',
-    projectId: 'social-app-test-62971',
-    storageBucket: 'social-app-test-62971.appspot.com',
-    iosClientId: '426668685640-lhja61jj40s4hob7tm5sk9s76egaubi9.apps.googleusercontent.com',
+    apiKey: 'AIzaSyBI9FiLMT5s6ME2sfm88rWfT4jnMN-hoh4',
+    appId: '1:225404424962:ios:a504b92c65d8eb8e53281b',
+    messagingSenderId: '225404424962',
+    projectId: 'memit-8f897',
+    storageBucket: 'memit-8f897.firebasestorage.app',
     iosBundleId: 'com.example.memit',
   );
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:memit/features/profile/models/profile_model.dart';
 import 'package:memit/features/profile/profile_bio.dart';
 import 'package:memit/features/profile/profile_stat.dart';
 
 class ProfileHeaderSection extends StatelessWidget {
-  const ProfileHeaderSection({super.key});
+  final ProfileModel profile;
+  const ProfileHeaderSection({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +19,11 @@ class ProfileHeaderSection extends StatelessWidget {
             Container(
               height: 180,
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 image: DecorationImage(
                   image: NetworkImage(
-                    'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1200&q=80',
+                    profile.coverImageUrl ??
+                        'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1200&q=80',
                   ),
                   fit: BoxFit.cover,
                 ),
@@ -30,21 +33,21 @@ class ProfileHeaderSection extends StatelessWidget {
             // Positioned CircleAvatar
             Positioned(
               bottom: -40,
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 40,
                 backgroundImage: NetworkImage(
-                  'https://plus.unsplash.com/premium_photo-1719943510748-4b4354fbcf56?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG5hdHVyZXxlbnwwfHwwfHx8MA%3D%3D',
+                  profile.profileImageUrl ??
+                      'https://plus.unsplash.com/premium_photo-1719943510748-4b4354fbcf56?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fG5hdHVyZXxlbnwwfHwwfHx8MA%3D%3D',
                 ),
               ),
             ),
           ],
         ),
         const SizedBox(height: 48), // Space below the avatar
-
         // Bio and Stats
-        const Padding(
+         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          child: ProfileBioSection(),
+          child: ProfileBioSection(profile: profile),
         ),
         const SizedBox(height: 16),
         const Row(

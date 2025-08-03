@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memit/features/profile/profile_screen.dart';
 import 'package:memit/routing/app_routes.dart';
+import 'package:memit/services/profile_service.dart';
 
 class AuthenticationScreen extends StatefulWidget {
   const AuthenticationScreen({super.key});
@@ -52,8 +54,9 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
         userCredential = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
-          
         );
+
+        await ProfileService.createUser(userCredential);
 
         await userCredential.user!.sendEmailVerification();
 

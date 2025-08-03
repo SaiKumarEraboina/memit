@@ -11,6 +11,7 @@ import 'package:memit/features/create_memes/presentation/meme_data_screen.dart';
 import 'package:memit/features/explore/explore_screen.dart';
 import 'package:memit/features/home/presentation/home_screen.dart';
 import 'package:memit/features/notifications/presentation/notifications_screen.dart';
+import 'package:memit/features/profile/edit_profile_screen.dart';
 import 'package:memit/features/profile/profile_screen.dart';
 import 'package:memit/routing/app_routes.dart';
 
@@ -35,6 +36,11 @@ final goRouter = GoRouter(
       path: AppRoutes.memeDataScreen,
       builder:
           (context, state) => MemeDataScreen(imagePath: state.extra as String?),
+    ),
+
+    GoRoute(
+      path: AppRoutes.editProfile,
+      builder: (context, state) => ProfileEditScreen(),
     ),
 
     GoRoute(

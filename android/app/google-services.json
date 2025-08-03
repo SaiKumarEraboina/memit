@@ -1,43 +1,26 @@
 {
   "project_info": {
-    "project_number": "426668685640",
-    "project_id": "social-app-test-62971",
-    "storage_bucket": "social-app-test-62971.appspot.com"
+    "project_number": "225404424962",
+    "project_id": "memit-8f897",
+    "storage_bucket": "memit-8f897.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:426668685640:android:bb454eef3cd4d6cd631b7d",
+        "mobilesdk_app_id": "1:225404424962:android:f2b73a160824079a53281b",
         "android_client_info": {
           "package_name": "com.example.memit"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "426668685640-2cp4op1uhd7fvivalqmip442bero2u8b.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAI-PnvgRyip0V42MjjGyU3pWpBbW3sJI0"
+          "current_key": "AIzaSyAwRAy3YjfH6w0EK1Ekj-0adwfsQbvfNgg"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "426668685640-2cp4op1uhd7fvivalqmip442bero2u8b.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "426668685640-e88j3m90afn8ecvhhjo6t519vbocfvll.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.socialAppTest"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

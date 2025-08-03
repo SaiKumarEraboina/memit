@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memit/features/profile/bloc/profile_bloc.dart';
+import 'package:memit/features/profile/profile_bio.dart';
 import 'package:memit/routing/app_routes.dart';
 import 'package:memit/services/posts_service.dart';
 
@@ -87,7 +90,7 @@ class _MemeDataScreenState extends State<MemeDataScreen> {
     String caption = description.text;
     String tagsList = tags.text;
     String authorId = FirebaseAuth.instance.currentUser!.uid;
-    String authorName = FirebaseAuth.instance.currentUser!.displayName ?? '';
+    String authorName = context.read<ProfileBloc>().profile?.name ?? "";
 
     var data = {
       'description': caption,
@@ -97,6 +100,8 @@ class _MemeDataScreenState extends State<MemeDataScreen> {
       'authorId': authorId,
       'authorName': authorName,
       'postUrl': postUrl,
+      'authorProfileImage':
+          context.read<ProfileBloc>().profile?.profileImageUrl,
       'createdAt': DateTime.now().millisecondsSinceEpoch,
     };
 
