@@ -12,6 +12,7 @@ import 'package:memit/features/posts/domain/entities/post.dart';
 import 'package:memit/features/posts/presentation/cubit/post_cubit.dart';
 import 'package:memit/features/posts/presentation/cubit/post_states.dart';
 import 'package:memit/routing/app_routes.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CreateMemesScreen extends StatefulWidget {
   const CreateMemesScreen({super.key});

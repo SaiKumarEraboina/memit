@@ -44,6 +44,7 @@ dependencies:
   video_trimmer: ^5.0.0
   crop_your_image: ^2.0.0
   shimmer: ^3.0.0
+  cached_network_image: ^3.3.1
 
   #Firebase
   firebase_core: ^4.0.0
@@ -58,6 +59,10 @@ dependencies:
   path: ^1.9.1
   image: ^4.2.0
 
+  flutter_bloc: ^9.1.1
+
+  #Editing
+  ffmpeg_kit_flutter_new: ^3.2.0
 
   # video_trimmer: ^5.0.0
   ffmpeg_kit_flutter: ^4.5.1
