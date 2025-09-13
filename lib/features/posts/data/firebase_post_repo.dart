@@ -1,0 +1,114 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:memit/features/posts/domain/entities/comment.dart';
+import 'package:memit/features/posts/domain/entities/post.dart';
+import 'package:memit/features/posts/domain/repo/post_repo.dart';
+
+class FirebasePostRepo implements PostRepo {
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  final CollectionReference postsCollection = FirebaseFirestore.instance
+      .collection('posts');
+
+  @override
+  Future<void> createPost(Post post) async {
+    try {
+      await postsCollection.doc(post.id).set(post.toJson());
+    } catch (e) {
+      throw Exception("Error in creating Post $e");
+    }
+  }
+
+  @override
+  Future<void> deletePost(String postId) async {
+    await postsCollection.doc(postId).delete();
+  }
+
+  @override
+  Future<List<Post>> fetchAllPosts() async {
+    try {
+      final postSnapshot =
+          await postsCollection.orderBy('timestamp', descending: true).get();
+      final List<Post> allPosts =
+          postSnapshot.docs
+              .map((doc) => Post.fromJson(doc.data() as Map<String, dynamic>))
+              .toList();
+      return allPosts;
+    } catch (e) {
+      throw Exception('unable to fetch all posts: $e');
+    }
+  }
+
+  @override
+  Future<List<Post>> fetchPostsByUser(String userId) async {
+    try {
+      final postSnapshot =
+          await postsCollection.where('userId', isEqualTo: userId).get();
+      final List<Post> userPosts =
+          postSnapshot.docs
+              .map((doc) => Post.fromJson(doc.data() as Map<String, dynamic>))
+              .toList();
+      return userPosts;
+    } catch (e) {
+      throw Exception('unable to fetch user posts: $e');
+    }
+  }
+
+  @override
+  Future<void> toggleLikepost(String postId, String userId) async {
+    try {
+      final postDoc = await postsCollection.doc(postId).get();
+      if (postDoc.exists) {
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+        final hasLiked = post.likes.contains(userId);
+        if (hasLiked) {
+          post.likes.remove(userId);
+        } else {
+          post.likes.add(userId);
+        }
+
+        await postsCollection.doc(postId).update({'likes': post.likes});
+      } else {
+        throw Exception("Post not Found");
+      }
+    } catch (e) {
+      throw Exception("Error toggling like :$e");
+    }
+  }
+
+  @override
+  Future<void> addComment(String postId, Comment comment) async {
+    try {
+      final postDoc = await postsCollection.doc(postId).get();
+      if (postDoc.exists) {
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+        post.comments.add(comment);
+
+        await postsCollection.doc(postId).update({
+          'comments': post.comments.map((comment) => comment.toJson()).toList(),
+        });
+      } else {
+        throw Exception("Post not Found");
+      }
+    } catch (e) {
+      throw Exception("Error adding comment:$e");
+    }
+  }
+
+  @override
+  Future<void> deleteComment(String postId, Comment comment) async{
+    try {
+      final postDoc = await postsCollection.doc(postId).get();
+      if (postDoc.exists) {
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+        post.comments.removeWhere((comment)=>comment.id == comment.id);
+
+        await postsCollection.doc(postId).update({
+          'comments': post.comments.map((comment) => comment.toJson()).toList(),
+        });
+      } else {
+        throw Exception("Post not Found");
+      }
+    } catch (e) {
+      throw Exception("Error in deleting comment:$e");
+    }
+  }
+}

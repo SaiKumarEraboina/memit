@@ -1,1 +1,1 @@
-enum CollageType { single, halfSplit, twoByTwo }
+enum CollageType { single, halfSplit,oneByTwo}

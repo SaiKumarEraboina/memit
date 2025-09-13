@@ -1,10 +1,8 @@
 // import 'dart:ui_web';
 
 import 'package:flutter/material.dart';
-import 'package:memit/common_widgets/responsive_center.dart';
 import 'package:memit/constants/app_sizes.dart';
 import 'package:memit/features/create_memes/model/post_model.dart';
-import 'package:memit/features/home/data/dummy_data.dart';
 import 'package:memit/features/home/domain/meme_model.dart';
 import 'package:memit/features/home/presentation/meme_body.dart';
 import 'package:memit/features/home/presentation/meme_caption_section.dart';
@@ -113,10 +111,10 @@ class _FeedLayoutState extends State<FeedLayout> {
 
     List<PostModel> allPosts = await PostsService.fetchAllPosts();
 
-    setState(() {
-      isLoading = false;
-      posts = allPosts;
-    });
+    // setState(() {
+    //   isLoading = false;
+    //   posts = allPosts;
+    // });
   }
 
   String getCreatedTime(int? createdAt) {

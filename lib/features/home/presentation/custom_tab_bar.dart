@@ -108,48 +108,49 @@ class _CustomTabBarState extends State<CustomTabBar>
   Widget build(BuildContext context) {
     return Column(
       children: [
- Material(
-  elevation: 2, // controls shadow depth
-  color: const Color(0xffEFF3F5), // background color
-  child: SizedBox(
-    height: 50.0,
-    child: ListView.builder(
-      controller: _scrollController,
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          key: _keys[index],
-          padding: const EdgeInsets.all(6.0),
-          child: AnimatedBuilder(
-            animation: _animationControllerOn,
-            builder: (context, child) => TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: _getBackgroundColor(index),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(7.0),
-                ),
-              ),
-              onPressed: () {
-                setState(() {
-                  _buttonTap = true;
-                  _controller.animateTo(index);
-                  _setCurrentIndex(index);
-                  _scrollTo(index);
-                });
+        Material(
+          elevation: 2, // controls shadow depth
+          color: const Color(0xffEFF3F5), // background color
+          child: SizedBox(
+            height: 50.0,
+            child: ListView.builder(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  key: _keys[index],
+                  padding: const EdgeInsets.all(6.0),
+                  child: AnimatedBuilder(
+                    animation: _animationControllerOn,
+                    builder:
+                        (context, child) => TextButton(
+                          style: TextButton.styleFrom(
+                            backgroundColor: _getBackgroundColor(index),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(7.0),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _buttonTap = true;
+                              _controller.animateTo(index);
+                              _setCurrentIndex(index);
+                              _scrollTo(index);
+                            });
+                          },
+                          child: Text(
+                            categories[index].label,
+                            style: TextStyle(color: _getForegroundColor(index)),
+                          ),
+                        ),
+                  ),
+                );
               },
-              child: Text(
-                categories[index].label,
-                style: TextStyle(color: _getForegroundColor(index)),
-              ),
             ),
           ),
-        );
-      },
-    ),
-  ),
-),
+        ),
 
         Expanded(
           child: TabBarView(

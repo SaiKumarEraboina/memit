@@ -1,37 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:memit/features/profile/bloc/profile_bloc.dart';
+import 'package:memit/features/auth/data/firebase_auth_repo.dart';
+import 'package:memit/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:memit/features/auth/presentation/cubit/auth_states.dart';
+import 'package:memit/features/auth/presentation/pages/auth_page.dart';
+import 'package:memit/features/posts/data/firebase_post_repo.dart';
+import 'package:memit/features/posts/presentation/cubit/post_cubit.dart';
+import 'package:memit/features/profile/cubit/profile_cubit.dart';
+import 'package:memit/features/profile/data/firebase_profile_repo.dart';
+import 'package:memit/features/storage/data/firebase_storage_repo.dart';
 import 'package:memit/routing/router.dart';
+import 'package:memit/themes/lignt_mode.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final firebaseAuthRepo = FirebaseAuthRepo();
+  final firebaseProfileRepo = FirebaseProfileRepo();
+  final firebaseStorageRepo = FirebaseStorageRepo();
+  final firebasePostRepo = FirebasePostRepo();
+
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<ProfileBloc>(
-      create: (context) => ProfileBloc(),
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        routerConfig: goRouter,
-        theme: ThemeData(
-          // * Use this to toggle Material 3 (defaults to true since Flutter 3.16)
-          useMaterial3: true,
-          primarySwatch: Colors.grey,
-          primaryColor: const Color(0xFFF0F0F0),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthCubit>(
+          create:
+              (context) => AuthCubit(authRepo: firebaseAuthRepo)..checkAuth(),
+        ),
+        BlocProvider<ProfileCubit>(
+          create:
+              (context) => ProfileCubit(
+                profileRepo: firebaseProfileRepo,
+                storageRepo: firebaseStorageRepo,
+              ),
+        ),
 
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.black87,
-            foregroundColor: Colors.white,
-            elevation: 0,
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black, // background (button) color
-              foregroundColor: Colors.white, // foreground (text) color
-            ),
-          ),
+        BlocProvider<PostCubit>(
+          create:
+              (context) => PostCubit(
+                postRepo: firebasePostRepo,
+                storageRepo: firebaseStorageRepo,
+              ),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: lightMode,
+        home: BlocConsumer<AuthCubit, AuthStates>(
+          builder: (context, state) {
+            if (state is AuthenticatedState) {
+              return AppRouter();
+            }
+            if (state is UnAuthenticatedState) {
+              return const AuthPage();
+            }
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          },
+          listener: (context, state) {
+            if (state is AuthErrorState) {
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.error)));
+            }
+          },
         ),
       ),
     );
   }
 }
+
+
+

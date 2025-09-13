@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:memit/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:memit/localization/string_hardcoded.dart';
 
-class HomeAppBar extends StatelessWidget implements PreferredSizeWidget{
-  const HomeAppBar({
-    super.key,
-  });
+class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
     return AppBar(
       centerTitle: false,
       leading: Padding(
@@ -34,26 +35,29 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget{
           height: 30,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(width: 0.5,color: Colors.grey)
+            border: Border.all(width: 0.5, color: Colors.grey),
           ),
           child: Center(
             child: Icon(
               Icons.message_sharp,
               color: Theme.of(context).iconTheme.color,
               size: Theme.of(context).iconTheme.copyWith(size: 14).size,
-    
             ), // Your icon here
           ),
         ),
-        SizedBox(width: 10,)
+        SizedBox(width: 10),
+        IconButton(
+          onPressed: () {
+            authCubit.logout();
+          },
+          icon: Icon(Icons.logout),
+        ),
       ],
-      
+
       backgroundColor: Color(0xffEFF3F5),
     );
   }
-  
 
   @override
   Size get preferredSize => const Size.fromHeight(60.0);
-  
 }

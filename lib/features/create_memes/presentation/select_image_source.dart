@@ -34,15 +34,16 @@ class _SelectMediaFromSourceState extends State<SelectMediaFromSource> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _handleTap(context),
-      child: controller.hasNoMedia
-          ? const AddMediaButton()
-          : MediaViewer(
-              isVideo: controller.isVideo,
-              videoController: controller.videoController,
-              imageFile: controller.selectedFile,
-              webImageBytes: controller.webImageBytes,
-              onTap: () => controller.openEditor(context),
-            ),
-    );
+      child: Placeholder());
+    //   controller.hasNoMedia
+    //       ? const AddMediaButton()
+    //       : MediaViewer(
+    //           isVideo: controller.isVideo,
+    //           videoController: controller.videoController,
+    //           imageFile: controller.selectedFile,
+    //           webImageBytes: controller.webImageBytes,
+    //           onTap: () => controller.openEditor(context),
+    //         ),
+    // );
   }
 }

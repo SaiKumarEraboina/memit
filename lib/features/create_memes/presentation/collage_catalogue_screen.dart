@@ -143,41 +143,39 @@ class Collage3 extends StatelessWidget {
   const Collage3({super.key});
   @override
   Widget build(BuildContext context) {
-    return CollageWrapper(
-      height: 200,
-      builder:
-          (ctx, showIcons) => Column(
-            children: [
-              Expanded(
-                child:
-                    showIcons
-                        ? const SelectMediaFromSource()
-                        : const SizedBox(),
-              ),
-              const HorizontalDivider(),
-              Expanded(
-                child: Row(
+    return GestureDetector(
+      onTap: (){
+           context.push(AppRoutes.fileInputScreen, extra: CollageType.oneByTwo);
+      },
+      child: SizedBox(
+        height: 200,
+        child: Card(
+            color: Colors.white,
+            child: Expanded(
+                child: Column(
                   children: [
                     Expanded(
-                      child:
-                          showIcons
-                              ? const SelectMediaFromSource()
-                              : const SizedBox(),
+                      child: const SizedBox(),
                     ),
-                    const VerticalDividerWidget(),
-                    Expanded(
-                      child:
-                          showIcons
-                              ? const SelectMediaFromSource()
-                              : const SizedBox(),
-                    ),
+                    const HorizontalDivider(),
+                    Expanded(child:Row(
+                      children: [
+                        Expanded(
+                          child: const SizedBox(),
+                        ),
+                        VerticalDivider(),
+                         Expanded(
+                          child: const SizedBox(),
+                        ),
+                      ],
+                    ),)
                   ],
                 ),
-              ),
-            ],
-          ),
+              ),    
+        ),
+      ),
     );
-  }
+ }
 }
 
 class Collage4 extends StatelessWidget {

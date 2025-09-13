@@ -1,58 +1,63 @@
 import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:memit/features/profile/bloc/profile_bloc.dart';
-import 'package:memit/features/profile/profile_bio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:memit/routing/app_routes.dart';
+import 'package:provider/provider.dart';
 import 'package:memit/services/posts_service.dart';
 
 class MemeDataScreen extends StatefulWidget {
-  final String? imagePath;
-  const MemeDataScreen({super.key, this.imagePath});
+  /// Path to the generated collage image file
+  final String collagePath;
+
+  const MemeDataScreen({
+    super.key,
+    required this.collagePath,
+  });
 
   @override
   State<MemeDataScreen> createState() => _MemeDataScreenState();
 }
 
 class _MemeDataScreenState extends State<MemeDataScreen> {
-  TextEditingController description = TextEditingController();
-
-  TextEditingController tags = TextEditingController();
-
+  final TextEditingController description = TextEditingController();
+  final TextEditingController tags = TextEditingController();
   bool isPosting = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          isPosting
-              ? CircularProgressIndicator(color: Colors.white)
-              : TextButton(
-                onPressed: () {
-                  if (widget.imagePath != null) {
-                    postMeme();
-                  }
-                },
-                child: Row(
-                  spacing: 8,
-                  children: [
-                    Text(
-                      'Post',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(Icons.send, color: Colors.white),
-                  ],
-                ),
-              ),
-        ],
-      ),
+        title: const Text("Meme Preview"),
+        // actions: [
+        //   isPosting
+        //       ? const Padding(
+        //           padding: EdgeInsets.all(12.0),
+        //           child: CircularProgressIndicator(color: Colors.white),
+        //         )
+        //       : TextButton(
+        //           onPressed: () {
+        //             if (widget.collagePath.isNotEmpty) {
+        //               postMeme();
+        //             }
+        //           },
+        //           child: const Row(
+        //             spacing: 8,
+        //             children: [
+        //               Text(
+        //                 'Post',
+        //                 style: TextStyle(
+        //                   color: Colors.white,
+        //                   fontWeight: FontWeight.bold,
+        //                 ),
+        //               ),
+        //               Icon(Icons.send, color: Colors.white),
+        //             ],
+        //           ),
+        //         ),
+        // ],
+
+),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -60,19 +65,19 @@ class _MemeDataScreenState extends State<MemeDataScreen> {
           children: [
             SizedBox(
               height: MediaQuery.of(context).size.height / 2,
-              child: Image.file(File(widget.imagePath!)),
+              child: Image.file(File(widget.collagePath)),
             ),
-
             TextFormField(
               controller: description,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Add your description here...',
               ),
             ),
-
             TextFormField(
               controller: tags,
-              decoration: InputDecoration(hintText: 'tags'),
+              decoration: const InputDecoration(
+                hintText: 'tags',
+              ),
             ),
           ],
         ),
@@ -80,37 +85,42 @@ class _MemeDataScreenState extends State<MemeDataScreen> {
     );
   }
 
-  Future<void> postMeme() async {
-    setState(() {
-      isPosting = true;
-    });
+  // Future<void> postMeme() async {
+  //   setState(() {
+  //     isPosting = true;
+  //   });
 
-    String? postUrl = await PostsService.uploadFile(File(widget.imagePath!));
+  //   try {
+  //     // Upload the generated collage
+  //     String? postUrl = await PostsService.uploadFile(File(widget.collagePath));
 
-    String caption = description.text;
-    String tagsList = tags.text;
-    String authorId = FirebaseAuth.instance.currentUser!.uid;
-    String authorName = context.read<ProfileBloc>().profile?.name ?? "";
+  //     String caption = description.text;
+  //     String tagsList = tags.text;
+  //     String authorId = FirebaseAuth.instance.currentUser!.uid;
+  //     String authorName = context.read<ProfileBloc>().profile?.name ?? "";
 
-    var data = {
-      'description': caption,
-      'tags': tagsList,
-      'commentsCount': 0,
-      'likesCounts': 0,
-      'authorId': authorId,
-      'authorName': authorName,
-      'postUrl': postUrl,
-      'authorProfileImage':
-          context.read<ProfileBloc>().profile?.profileImageUrl,
-      'createdAt': DateTime.now().millisecondsSinceEpoch,
-    };
+  //     var data = {
+  //       'description': caption,
+  //       'tags': tagsList,
+  //       'commentsCount': 0,
+  //       'likesCounts': 0,
+  //       'authorId': authorId,
+  //       'authorName': authorName,
+  //       'postUrl': postUrl,
+  //       'authorProfileImage':
+  //           context.read<ProfileBloc>().profile?.profileImageUrl,
+  //       'createdAt': DateTime.now().millisecondsSinceEpoch,
+  //     };
 
-    await PostsService.createPost(data: data);
+  //     await PostsService.createPost(data: data);
 
-    setState(() {
-      isPosting = false;
-    });
+  //     context.go(AppRoutes.home);
+  //   } finally {
+  //     setState(() {
+  //       isPosting = false;
+  //     });
+  //   }
+  // }
 
-    context.go(AppRoutes.home);
-  }
+
 }

@@ -1,9 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memit/common_widgets/custom_bottom_navigation.dart';
 import 'package:memit/constants/constants.dart';
-import 'package:memit/features/auth/authentication_screen.dart';
+import 'package:memit/features/auth/presentation/pages/auth_page.dart';
 import 'package:memit/features/create_memes/presentation/collage_catalogue_screen.dart';
 import 'package:memit/features/create_memes/presentation/create_memes_screen.dart';
 import 'package:memit/features/create_memes/presentation/file_input_screen.dart';
@@ -11,104 +10,115 @@ import 'package:memit/features/create_memes/presentation/meme_data_screen.dart';
 import 'package:memit/features/explore/explore_screen.dart';
 import 'package:memit/features/home/presentation/home_screen.dart';
 import 'package:memit/features/notifications/presentation/notifications_screen.dart';
+import 'package:memit/features/posts/presentation/components/home_page.dart';
+import 'package:memit/features/profile/componnents/profile_page.dart';
+import 'package:memit/features/profile/domain/entities/profile_user.dart';
 import 'package:memit/features/profile/edit_profile_screen.dart';
-import 'package:memit/features/profile/profile_screen.dart';
 import 'package:memit/routing/app_routes.dart';
+import 'package:memit/themes/lignt_mode.dart';
 
-final goRouter = GoRouter(
-  initialLocation: AppRoutes.home,
-  redirect: (context, state) {
-    if (FirebaseAuth.instance.currentUser != null) {
-      //case user logged in
-      return null;
-    } else {
-      return AppRoutes.auth;
-    }
-  },
-  routes: [
-    /// ✅ Standalone screen outside bottom navigation shell
-    GoRoute(
-      path: AppRoutes.collageCatalogue,
-      builder: (context, state) => const CollageCatalogueScreen(),
-    ),
+class AppRouter extends StatelessWidget {
+  AppRouter({super.key});
 
-    GoRoute(
-      path: AppRoutes.memeDataScreen,
-      builder:
-          (context, state) => MemeDataScreen(imagePath: state.extra as String?),
-    ),
+  final GoRouter _router = GoRouter(
+    initialLocation: AppRoutes.home,
 
-    GoRoute(
-      path: AppRoutes.editProfile,
-      builder: (context, state) => ProfileEditScreen(),
-    ),
+    routes: [
+      GoRoute(
+        path: AppRoutes.collageCatalogue,
+        builder: (context, state) => const CollageCatalogueScreen(),
+      ),
 
-    GoRoute(
-      path: AppRoutes.fileInputScreen,
-      builder:
-          (context, state) =>
-              FileInputScreen(collageType: state.extra as CollageType?),
-    ),
+      GoRoute(
+        path: AppRoutes.auth,
+        builder: (context, state) => const AuthPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.memeDataScreen,
+        builder: (context, state) {
+          final collagePath = state.extra as String;
+          return MemeDataScreen(collagePath: collagePath);
+        },
+      ),
 
-    GoRoute(
-      path: AppRoutes.auth,
-      builder: (context, state) => AuthenticationScreen(),
-    ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) {
+          final profileUser = state.extra as ProfileUser;
+          return EditProfilePage(profileUser: profileUser);
+        },
+      ),
 
-    /// ✅ Standalone screen outside bottom navigation shell
-    GoRoute(
-      path: AppRoutes.collageCatalogue,
-      builder: (context, state) => const CollageCatalogueScreen(),
-    ),
+      GoRoute(
+        path: AppRoutes.fileInputScreen,
+        builder:
+            (context, state) =>
+                FileInputScreen(collageType: state.extra as CollageType),
+      ),
 
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, shell) => CustomBottomNavigation(shell: shell),
-      branches: [
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppRoutes.home,
-              builder: (context, state) => const HomeScreen(),
-            ),
-          ],
-        ),
+      GoRoute(
+        path: AppRoutes.collageCatalogue,
+        builder: (context, state) => const CollageCatalogueScreen(),
+      ),
 
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppRoutes.explore,
-              builder: (context, state) => const ExploreScreen(),
-            ),
-          ],
-        ),
+      StatefulShellRoute.indexedStack(
+        builder:
+            (context, state, shell) => CustomBottomNavigation(shell: shell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomePage(),
+              ),
+            ],
+          ),
 
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppRoutes.createMemes,
-              builder: (context, state) => const CreateMemesScreen(),
-            ),
-          ],
-        ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.explore,
+                builder: (context, state) => const ExploreScreen(),
+              ),
+            ],
+          ),
 
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppRoutes.notifications,
-              builder: (context, state) => const NotificationScreen(),
-            ),
-          ],
-        ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.createMemes,
+                builder: (context, state) => const CreateMemesScreen(),
+              ),
+            ],
+          ),
 
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppRoutes.profile,
-              builder: (context, state) => const ProfileScreen(),
-            ),
-          ],
-        ),
-      ],
-    ),
-  ],
-);
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.notifications,
+                builder: (context, state) => const NotificationScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                builder: (context, state) => const ProfilePage(), 
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      theme: lightMode,
+      routerConfig: _router,
+    );
+  }
+}
