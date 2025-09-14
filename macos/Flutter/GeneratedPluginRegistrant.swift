@@ -6,7 +6,7 @@ import FlutterMacOS
 import Foundation
 
 import cloud_firestore
-import ffmpeg_kit_flutter
+import ffmpeg_kit_flutter_new
 import file_picker
 import file_selector_macos
 import firebase_app_check

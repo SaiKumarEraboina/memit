@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memit/features/auth/domain/entities/app_user.dart';
-import 'package:memit/features/auth/presentation/components/custom_textfield.dart';
 import 'package:memit/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:memit/features/posts/domain/entities/post.dart';
 import 'package:memit/features/posts/presentation/cubit/post_cubit.dart';
 import 'package:memit/features/posts/presentation/cubit/post_states.dart';
 import 'package:memit/routing/app_routes.dart';
-import 'package:path_provider/path_provider.dart';
 
 class CreateMemesScreen extends StatefulWidget {
   const CreateMemesScreen({super.key});
@@ -29,8 +27,18 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
 
   @override
   void initState() {
-    getCurrentUser();
     super.initState();
+    getCurrentUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final collageType =
+          GoRouterState.of(context).extra as String? ?? "single";
+      if (collageType != "single") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$collageType collage coming soon!')),
+        );
+        Navigator.of(context).pop();
+      }
+    });
   }
 
   void getCurrentUser() {
@@ -57,7 +65,7 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
     if (imagePickedFile == null || captionController.text.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Both Image and caption are required')),
+        const SnackBar(content: Text('Both Image and caption are required')),
       );
       return;
     }
@@ -72,7 +80,6 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
       comments: [],
     );
     final postCubit = context.read<PostCubit>();
-    // postCubit.createPost(newPost);
     if (kIsWeb) {
       postCubit.createPost(newPost, imageBytes: imagePickedFile?.bytes);
     } else {
@@ -91,201 +98,145 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
     return BlocConsumer<PostCubit, PostStates>(
       builder: (context, state) {
         if (state is PostsLoadingState || state is PostsUploadingState) {
-          return Scaffold(body: CircularProgressIndicator());
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
-        return buidUploadPage();
+        return buildInstagramStyleUploadPage();
       },
       listener: (context, state) {
         if (state is PostsLoadedState) {
-          // Navigator.of(context).pop();
           context.go(AppRoutes.home);
-
-          // Scaffold(
-          //   appBar: AppBar(
-          //     actions: [
-          //       IconButton(
-          //         onPressed:
-          //             () => Navigator.of(context).push(
-          //               MaterialPageRoute(
-          //                 builder: (context) {
-          //                   return HomePage();
-          //                 },
-          //               ),
-          //             ),
-          //         icon: Icon(Icons.abc_outlined),
-          //       ),
-          //     ],
-          //   ),
-          // );
         }
       },
     );
   }
 
-  Widget buidUploadPage() {
+  Widget buildInstagramStyleUploadPage() {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Create Meme',
-          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [IconButton(onPressed: uploadPost, icon: Icon(Icons.upload))],
-      ),
-      body: Column(
-        children: [
-          if (kIsWeb && webImage != null) Image.memory(webImage!),
-          if (!kIsWeb && imagePickedFile != null)
-            Image.file(File(imagePickedFile!.path!)),
-
-          MaterialButton(
-            color: Colors.blue,
-            onPressed: pickImage,
-            child: Text('Pick Image'),
-          ),
-
-          CustomTextField(
-            controller: captionController,
-            hintText: 'caption',
-            obscureText: false,
+        title: const Text(
+          'New Post',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          TextButton(
+            onPressed: uploadPost,
+            child: const Text(
+              'Share',
+              style: TextStyle(
+                color: Color(0xFF0095F6),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
           ),
         ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Column(
+          children: [
+            // User avatar and name
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.grey[300],
+                  backgroundImage: currentUser?.name != null
+                      ? NetworkImage(currentUser!.name)
+                      : null,
+                  child: currentUser?.name == null
+                      ? const Icon(Icons.person, color: Colors.white)
+                      : null,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  currentUser?.name ?? '',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            // Image preview with overlay
+            GestureDetector(
+              onTap: pickImage,
+              child: Container(
+                width: double.infinity,
+                height: 320,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: imagePickedFile == null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.add_a_photo,
+                                size: 48, color: Colors.grey),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Add Photo',
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: kIsWeb && webImage != null
+                            ? Image.memory(webImage!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 320)
+                            : Image.file(File(imagePickedFile!.path!),
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: 320),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            // Caption field
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: TextField(
+                controller: captionController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: 'Write a caption...',
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Pick image button (hidden, but keep for accessibility)
+            Offstage(
+              offstage: true,
+              child: MaterialButton(
+                color: Colors.blue,
+                onPressed: pickImage,
+                child: const Text('Pick Image'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-// @override
-// Widget build(BuildContext context) {
-//   return Scaffold(
-//     body: ResponsiveScrollableCard(
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Padding(
-//             padding: const EdgeInsets.only(top: 50),
-//             child: Text(
-//               'Create Meme',
-//               style: TextStyle(color: Theme.of(context).colorScheme.primary),
-//             ),
-//           ),
-//           const SizedBox(height: 16),
-//           InkWell(
-//             onTap: () => context.push(AppRoutes.collageCatalogue),
-//             child: Container(
-//               width: double.infinity,
-//               height: 200,
-//               decoration: BoxDecoration(
-//                 borderRadius: BorderRadius.circular(16),
-//                 border: Border.all(width: 0.5, color: Color(0xffB4B4B4)),
-//                 color: const Color(0xFFE8F3FF),
-//               ),
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 crossAxisAlignment: CrossAxisAlignment.center,
-//                 children: [
-//                   SvgPicture.asset(
-//                     'assets/icons/add_circle.svg',
-//                     width: 40,
-//                     height: 40,
-//                     colorFilter: const ColorFilter.mode(
-//                       Colors.black,
-//                       BlendMode.srcIn,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 8), // Space between icon and text
-//                   const Text('Create your meme'),
-//                 ],
-//               ),
-//             ),
-//           ),
-//           const SizedBox(height: 14),
-//           Text('Meme Template', style: Theme.of(context).textTheme.titleMedium),
-//           const SizedBox(height: 8),
-//           TextFormField(
-//             decoration: InputDecoration(
-//               hintText: 'Search Template',
-//               contentPadding: const EdgeInsets.symmetric(
-//                 vertical: 0,
-//                 horizontal: 20,
-//               ),
-//               border: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(30), // <- Rounded corners
-//                 borderSide: const BorderSide(
-//                   width: 0.5,
-//                   color: Color(0xffB4B4B4),
-//                 ),
-//               ),
-//               enabledBorder: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(30),
-//                 borderSide: const BorderSide(
-//                   width: 0.5,
-//                   color: Color(0xffB4B4B4),
-//                 ),
-//               ),
-//               focusedBorder: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(30),
-//                 borderSide: const BorderSide(
-//                   width: 0.5,
-//                   color: Color(0xffB4B4B4),
-//                 ),
-//               ),
-//               filled: true,
-//               fillColor: Colors.white,
-//             ),
-//           ),
-//           const SizedBox(height: 14),
-
-//           const SizedBox(height: 24),
-//           Text(
-//             'Create with Latest Templates',
-//             style: Theme.of(context).textTheme.titleMedium,
-//           ),
-//           const SizedBox(height: 12),
-//           Column(
-//             children: [
-//               Row(
-//                 children: const [
-//                   Expanded(
-//                     child: Template(
-//                       image: 'fire',
-//                       templateTitle: 'Trending',
-//                       templateDescription: 'Use Trending meme template',
-//                     ),
-//                   ),
-//                   SizedBox(width: 12),
-//                   Expanded(
-//                     child: Template(
-//                       image: 'movie',
-//                       templateTitle: 'Movie',
-//                       templateDescription: 'Meme templates from movies',
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               SizedBox(height: 12),
-//               Row(
-//                 children: const [
-//                   Expanded(
-//                     child: Template(
-//                       image: 'smiley',
-//                       templateTitle: 'Funny',
-//                       templateDescription: 'Light-hearted and fun memes',
-//                     ),
-//                   ),
-//                   SizedBox(width: 12),
-//                   Expanded(
-//                     child: Template(
-//                       image: 'game',
-//                       templateTitle: 'Gaming',
-//                       templateDescription: 'Gaming-related memes',
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     ),
-//   );
-// }
