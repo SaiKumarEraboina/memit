@@ -9,6 +9,7 @@ import 'package:memit/features/posts/domain/entities/post.dart';
 import 'package:memit/features/posts/presentation/cubit/post_cubit.dart';
 import 'package:memit/features/profile/cubit/profile_cubit.dart';
 import 'package:memit/features/profile/domain/entities/profile_user.dart';
+import 'package:video_player/video_player.dart';
 
 class PostTile extends StatefulWidget {
   const PostTile({super.key, required this.post, required this.onDelete});
@@ -26,11 +27,15 @@ class _PostTileState extends State<PostTile> {
   AppUser? currentUser;
   ProfileUser? postUser;
   final commentTextController = TextEditingController();
+  VideoPlayerController? _videoController;
+  bool _isVideo = false;
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
     fetchPostUser();
+    _checkIfVideo();
   }
 
   void openNewCommentBox() {
@@ -79,9 +84,22 @@ class _PostTileState extends State<PostTile> {
     }
   }
 
+  void _checkIfVideo() {
+    final url = widget.post.imageUrl;
+    final isVideo = widget.post.mediaType ?? 'image';
+    _isVideo = isVideo == 'video';
+    if (_isVideo) {
+      _videoController = VideoPlayerController.network(url)
+        ..initialize().then((_) {
+          setState(() {});
+        });
+    }
+  }
+
   @override
   void dispose() {
     commentTextController.dispose();
+    _videoController?.dispose();
     super.dispose();
   }
 
@@ -184,22 +202,60 @@ class _PostTileState extends State<PostTile> {
               ],
             ),
           ),
-          // Post image
-          CachedNetworkImage(
-            imageUrl: widget.post.imageUrl,
-            width: double.infinity,
-            height: 400,
-            fit: BoxFit.cover,
-            errorWidget: (context, url, error) => Container(
-              height: 400,
-              color: Colors.grey[200],
-              child: const Icon(Icons.error, size: 40),
-            ),
-            placeholder: (context, url) => Container(
-              height: 400,
-              color: Colors.grey[200],
-            ),
-          ),
+          // Post media (image or video)
+          _isVideo
+              ? Container(
+                  width: double.infinity,
+                  height: 400,
+                  color: Colors.black,
+                  child: _videoController != null &&
+                          _videoController!.value.isInitialized
+                      ? Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            AspectRatio(
+                              aspectRatio: _videoController!.value.aspectRatio,
+                              child: VideoPlayer(_videoController!),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  if (_videoController!.value.isPlaying) {
+                                    _videoController!.pause();
+                                  } else {
+                                    _videoController!.play();
+                                  }
+                                });
+                              },
+                              child: Icon(
+                                _videoController!.value.isPlaying
+                                    ? Icons.pause_circle_filled
+                                    : Icons.play_circle_filled,
+                                color: Colors.white.withOpacity(0.7),
+                                size: 64,
+                              ),
+                            ),
+                          ],
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                )
+              : CachedNetworkImage(
+                  imageUrl: widget.post.imageUrl,
+                  width: double.infinity,
+                  height: 400,
+                  fit: BoxFit.contain,
+                  errorWidget: (context, url, error) => Container(
+                    height: 400,
+                    color: Colors.grey[200],
+                    child: const Icon(Icons.error, size: 40),
+                  ),
+                  placeholder: (context, url) => Container(
+                    height: 400,
+                    color: Colors.grey[200],
+                  ),
+                ),
           // Action row: Like, Comment, Share, Bookmark
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),

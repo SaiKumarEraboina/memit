@@ -59,6 +59,8 @@ dependencies:
 
   #Editing
   ffmpeg_kit_flutter_new: ^3.2.0
+  pro_image_editor: ^11.5.6
+  media_kit: ^1.2.0
 
 dev_dependencies:
   flutter_test:

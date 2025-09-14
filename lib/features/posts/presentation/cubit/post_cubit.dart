@@ -9,45 +9,50 @@ import 'package:memit/features/storage/domain/storage_repo.dart';
 class PostCubit extends Cubit<PostStates> {
   final PostRepo postRepo;
   final StorageRepo storageRepo;
+
   PostCubit({required this.postRepo, required this.storageRepo})
-    : super(PostsInitialState());
+      : super(PostsInitialState());
 
   Future<void> createPost(
     Post post, {
-    String? imagePath,
-    Uint8List? imageBytes,
+    String? mediaPath, // image/video path (mobile)
+    Uint8List? mediaBytes, // image/video bytes (web)
+    String? mediaType, // "image" or "video"
   }) async {
-    String? imageUrl;
+    String? mediaUrl;
     try {
-      if (imagePath != null) {
+      if (mediaPath != null) {
         emit(PostsUploadingState());
-        imageUrl = await storageRepo.uploadPostImageMobile(
-          path: imagePath,
+        mediaUrl = await storageRepo.uploadPostMediaMobile(
+          path: mediaPath,
           fileName: post.id,
+          mediaType: mediaType ?? "image",
         );
-      } else if (imageBytes != null) {
+      } else if (mediaBytes != null) {
         emit(PostsUploadingState());
-        imageUrl = await storageRepo.uploadPostImageWeb(
-          fileBytes: imageBytes,
+        mediaUrl = await storageRepo.uploadPostMediaWeb(
+          fileBytes: mediaBytes,
           fileName: post.id,
+          mediaType: mediaType ?? "image",
         );
       }
-      final newPost = post.copyWith(newImageUrl: imageUrl);
+
+      // Create new post with mediaUrl
+      final newPost = post.copyWith(newImageUrl: mediaUrl);
 
       await postRepo.createPost(newPost);
       print("Saving post: ${newPost.toJson()}");
 
-      await fetchAllPosts();
+      emit(PostUploadSuccessState());
     } catch (e) {
       emit(PostsErrorState(error: e.toString()));
     }
   }
 
   Future<void> fetchAllPosts() async {
-    List<Post> allPosts;
     try {
       emit(PostsLoadingState());
-      allPosts = await postRepo.fetchAllPosts();
+      final allPosts = await postRepo.fetchAllPosts();
       emit(PostsLoadedState(posts: allPosts));
     } catch (e) {
       emit(PostsErrorState(error: e.toString()));
@@ -56,7 +61,8 @@ class PostCubit extends Cubit<PostStates> {
 
   Future<void> deletePost({required String postId}) async {
     try {
-      postRepo.deletePost(postId);
+      await postRepo.deletePost(postId);
+      await fetchAllPosts();
     } catch (e) {
       emit(PostsErrorState(error: e.toString()));
     }
@@ -65,31 +71,27 @@ class PostCubit extends Cubit<PostStates> {
   Future<void> togglePost(String postId, String userId) async {
     try {
       await postRepo.toggleLikepost(postId, userId);
-
+      await fetchAllPosts();
     } catch (e) {
       emit(PostsErrorState(error: 'Failed to toggle like: $e'));
     }
   }
 
-Future<void> addComment(String postId, Comment comment) async {
-  try {
-    await postRepo.addComment(postId, comment);
-
-    await fetchAllPosts();
-  } catch (e) {
-    emit(PostsErrorState(error: "Failed to add comment: $e"));
+  Future<void> addComment(String postId, Comment comment) async {
+    try {
+      await postRepo.addComment(postId, comment);
+      await fetchAllPosts();
+    } catch (e) {
+      emit(PostsErrorState(error: "Failed to add comment: $e"));
+    }
   }
-}
 
-Future<void>  deleteComment(String postId, Comment comment) async {
-  try {
-    await postRepo.deleteComment(postId, comment);
-
-    await fetchAllPosts();
-  } catch (e) {
-    emit(PostsErrorState(error: "Failed to Delete comment: $e"));
+  Future<void> deleteComment(String postId, Comment comment) async {
+    try {
+      await postRepo.deleteComment(postId, comment);
+      await fetchAllPosts();
+    } catch (e) {
+      emit(PostsErrorState(error: "Failed to delete comment: $e"));
+    }
   }
-}
-
-  
 }

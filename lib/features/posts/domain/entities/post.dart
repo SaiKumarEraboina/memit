@@ -10,6 +10,7 @@ class Post {
   final DateTime timestamp;
   final List<String> likes;
   final List<Comment> comments;
+  final String? mediaType;
   Post({
     required this.id,
     required this.userId,
@@ -18,7 +19,8 @@ class Post {
     required this.imageUrl,
     required this.timestamp,
     required this.likes,
-    required this.comments
+    required this.comments,
+    required this.mediaType,
   });
   Post copyWith({String? newImageUrl, String? newUserName}) {
     return Post(
@@ -29,25 +31,28 @@ class Post {
       imageUrl: newImageUrl ?? imageUrl,
       timestamp: timestamp,
       likes: likes,
-      comments: comments
+      comments: comments,
+      mediaType: mediaType ?? 'image',
     );
   }
 
   // from Map to object
   factory Post.fromJson(Map<String, dynamic> postMap) {
-    final List<Comment> comments = (postMap['comments'] as
-     List<dynamic>?)?.map((commentJson)=>Comment.fromJson(commentJson)).toList()??[];
+    final List<Comment> comments = (postMap['comments'] as List<dynamic>?)
+            ?.map((commentJson) => Comment.fromJson(commentJson))
+            .toList() ??
+        [];
 
     return Post(
-      id: postMap['id'],
-      userId: postMap['userId'],
-      userName: postMap['userName'],
-      text: postMap['text'],
-      imageUrl: postMap['imageUrl'],
-      timestamp: (postMap['timestamp'] as Timestamp).toDate(),
-      likes: List<String>.from(postMap['likes'] ?? []),
-      comments: comments
-    );
+        id: postMap['id'],
+        userId: postMap['userId'],
+        userName: postMap['userName'],
+        text: postMap['text'],
+        imageUrl: postMap['imageUrl'],
+        timestamp: (postMap['timestamp'] as Timestamp).toDate(),
+        likes: List<String>.from(postMap['likes'] ?? []),
+        comments: comments,
+        mediaType: postMap['mediaType'] ?? 'image');
   }
   //from Object to map
 
@@ -59,7 +64,9 @@ class Post {
       'text': text,
       'imageUrl': imageUrl,
       'timestamp': Timestamp.fromDate(timestamp),
-      'comments': comments.map((comment)=>comment.toJson()).toList()
+      'comments': comments.map((comment) => comment.toJson()).toList(),
+      'likes': likes,
+      'mediaType': mediaType ?? 'image',
     };
   }
 }

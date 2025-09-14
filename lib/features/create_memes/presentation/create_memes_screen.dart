@@ -10,10 +10,15 @@ import 'package:memit/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:memit/features/posts/domain/entities/post.dart';
 import 'package:memit/features/posts/presentation/cubit/post_cubit.dart';
 import 'package:memit/features/posts/presentation/cubit/post_states.dart';
+import 'package:memit/features/profile/cubit/profile_cubit.dart';
+import 'package:memit/features/profile/cubit/profile_state.dart';
+import 'package:memit/global/helpers.dart';
 import 'package:memit/routing/app_routes.dart';
+import 'package:video_player/video_player.dart';
 
 class CreateMemesScreen extends StatefulWidget {
-  const CreateMemesScreen({super.key});
+  final File file;
+  const CreateMemesScreen({super.key, required this.file});
 
   @override
   State<CreateMemesScreen> createState() => _CreateMemesScreenState();
@@ -21,24 +26,12 @@ class CreateMemesScreen extends StatefulWidget {
 
 class _CreateMemesScreenState extends State<CreateMemesScreen> {
   TextEditingController captionController = TextEditingController();
-  PlatformFile? imagePickedFile;
-  Uint8List? webImage;
   AppUser? currentUser;
 
   @override
   void initState() {
     super.initState();
     getCurrentUser();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final collageType =
-          GoRouterState.of(context).extra as String? ?? "single";
-      if (collageType != "single") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$collageType collage coming soon!')),
-        );
-        Navigator.of(context).pop();
-      }
-    });
   }
 
   void getCurrentUser() {
@@ -46,23 +39,8 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
     currentUser = authCubit.currentUser;
   }
 
-  Future<void> pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      withData: kIsWeb,
-    );
-    if (result != null) {
-      setState(() {
-        imagePickedFile = result.files.first;
-        if (kIsWeb) {
-          webImage = imagePickedFile!.bytes;
-        }
-      });
-    }
-  }
-
-  void uploadPost() {
-    if (imagePickedFile == null || captionController.text.isEmpty) {
+  Future<void> uploadPost() async {
+    if (captionController.text.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Both Image and caption are required')),
@@ -75,16 +53,18 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
       userName: currentUser!.name,
       text: captionController.text,
       imageUrl: '',
+      mediaType: isVideoFile(widget.file) ? 'video' : 'image',
       timestamp: DateTime.now(),
       likes: [],
       comments: [],
     );
     final postCubit = context.read<PostCubit>();
-    if (kIsWeb) {
-      postCubit.createPost(newPost, imageBytes: imagePickedFile?.bytes);
-    } else {
-      postCubit.createPost(newPost, imagePath: imagePickedFile?.path);
-    }
+
+    await postCubit.createPost(newPost,
+        mediaPath: widget.file.path,
+        mediaType: isVideoFile(widget.file) ? "video" : "image");
+
+    context.pop();
   }
 
   @override
@@ -97,15 +77,10 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
   Widget build(BuildContext context) {
     return BlocConsumer<PostCubit, PostStates>(
       builder: (context, state) {
-        if (state is PostsLoadingState || state is PostsUploadingState) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
         return buildInstagramStyleUploadPage();
       },
       listener: (context, state) {
-        if (state is PostsLoadedState) {
+        if (state is PostUploadSuccessState) {
           context.go(AppRoutes.home);
         }
       },
@@ -115,128 +90,176 @@ class _CreateMemesScreenState extends State<CreateMemesScreen> {
   Widget buildInstagramStyleUploadPage() {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'New Post',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          TextButton(
-            onPressed: uploadPost,
-            child: const Text(
-              'Share',
-              style: TextStyle(
-                color: Color(0xFF0095F6),
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
+        appBar: AppBar(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          elevation: 0,
+          leading: IconButton(
+              icon: const Icon(Icons.close, color: Colors.black),
+              onPressed: context.pop),
+          title: const Text(
+            'New Post',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        child: Column(
-          children: [
-            // User avatar and name
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage: currentUser?.name != null
-                      ? NetworkImage(currentUser!.name)
-                      : null,
-                  child: currentUser?.name == null
-                      ? const Icon(Icons.person, color: Colors.white)
-                      : null,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  currentUser?.name ?? '',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            // Image preview with overlay
-            GestureDetector(
-              onTap: pickImage,
-              child: Container(
-                width: double.infinity,
-                height: 320,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: imagePickedFile == null
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.add_a_photo,
-                                size: 48, color: Colors.grey),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Add Photo',
-                              style: TextStyle(
-                                  color: Colors.grey[600], fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: kIsWeb && webImage != null
-                            ? Image.memory(webImage!,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 320)
-                            : Image.file(File(imagePickedFile!.path!),
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: 320),
-                      ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            // Caption field
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              child: TextField(
-                controller: captionController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Write a caption...',
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            // Pick image button (hidden, but keep for accessibility)
-            Offstage(
-              offstage: true,
-              child: MaterialButton(
-                color: Colors.blue,
-                onPressed: pickImage,
-                child: const Text('Pick Image'),
-              ),
+          actions: [
+            BlocBuilder<PostCubit, PostStates>(
+              builder: (context, state) {
+                if (state is PostsUploadingState) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return TextButton(
+                  onPressed: uploadPost,
+                  child: const Text(
+                    'Share',
+                    style: TextStyle(
+                      color: Color(0xFF0095F6),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
-      ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Column(
+            children: [
+              // User avatar and name
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: currentUser?.name != null
+                        ? NetworkImage(currentUser!.name)
+                        : null,
+                    child: currentUser?.name == null
+                        ? const Icon(Icons.person, color: Colors.white)
+                        : null,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    currentUser?.name ?? '',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              // Image preview with overlay
+
+              buildMediaPreview(),
+              const SizedBox(height: 18),
+              // Caption field
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                child: TextField(
+                  controller: captionController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    hintText: 'Write a caption...',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Pick image button (hidden, but keep for accessibility)
+            ],
+          ),
+        ));
+  }
+
+  Widget buildMediaPreview() {
+    bool isVideo = isVideoFile(widget.file);
+    if (isVideo) {
+      return _VideoPreviewWidget(file: widget.file);
+    } else {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.file(
+          widget.file,
+          fit: BoxFit.contain,
+          width: double.infinity,
+          height: 320,
+        ),
+      );
+    }
+  }
+}
+
+// Helper widget for video preview
+class _VideoPreviewWidget extends StatefulWidget {
+  final File file;
+  const _VideoPreviewWidget({required this.file});
+
+  @override
+  State<_VideoPreviewWidget> createState() => _VideoPreviewWidgetState();
+}
+
+class _VideoPreviewWidgetState extends State<_VideoPreviewWidget> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.file(widget.file)
+      ..initialize().then((_) {
+        setState(() {
+          _initialized = true;
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return const SizedBox(
+        height: 320,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        AspectRatio(
+          aspectRatio: _controller.value.aspectRatio,
+          child: VideoPlayer(_controller),
+        ),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              if (_controller.value.isPlaying) {
+                _controller.pause();
+              } else {
+                _controller.play();
+              }
+            });
+          },
+          child: Icon(
+            _controller.value.isPlaying
+                ? Icons.pause_circle_filled
+                : Icons.play_circle_filled,
+            color: Colors.white.withOpacity(0.7),
+            size: 64,
+          ),
+        ),
+      ],
     );
   }
 }

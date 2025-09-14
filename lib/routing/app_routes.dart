@@ -9,6 +9,7 @@ class AppRoutes {
   static const memeDataScreen = '/meme-data-screen';
   static const fileInputScreen = '/fileInputScreen';
   static const editProfile = '/edit-profile';
+  static const selectPosts = '/select-posts';
 
   static const bottomNavRoutes = [
     home,

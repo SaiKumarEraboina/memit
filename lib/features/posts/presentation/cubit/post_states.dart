@@ -17,3 +17,5 @@ class PostsErrorState extends PostStates {
   final String error;
   PostsErrorState({required this.error});
 }
+
+class PostUploadSuccessState extends PostStates {}

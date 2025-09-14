@@ -3,8 +3,7 @@ import 'package:memit/common_widgets/responsive_center.dart';
 import 'package:memit/constants/breakpoints.dart';
 import 'package:memit/features/home/presentation/custom_tab_bar.dart';
 import 'package:memit/features/home/presentation/home_app_bar.dart';
-// import 'package:memit/features/profile/bloc/profile_bloc.dart';
-// import 'package:memit/features/profile/bloc/profile_event.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

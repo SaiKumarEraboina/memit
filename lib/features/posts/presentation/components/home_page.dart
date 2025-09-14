@@ -36,13 +36,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        foregroundColor: Theme.of(context).colorScheme.primary,
-      ),
       body: BlocBuilder<PostCubit, PostStates>(
+        buildWhen: (previous, current) =>
+            current is PostsLoadingState ||
+            current is PostsLoadedState ||
+            current is PostsErrorState,
         builder: (context, state) {
-          if (state is PostsUploadingState || state is PostsLoadingState) {
+          if (state is PostsLoadingState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is PostsLoadedState) {
             final allPosts = state.posts;

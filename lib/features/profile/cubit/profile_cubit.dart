@@ -7,7 +7,7 @@ import 'package:memit/features/storage/domain/storage_repo.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit({required this.profileRepo, required this.storageRepo})
-    : super(ProfileInitialState());
+      : super(ProfileInitialState());
   final ProfileRepo profileRepo;
   final StorageRepo storageRepo;
 
@@ -59,7 +59,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         } else if (imageWebBytes != null) {
           print('Uploading web image for UID: $uid'); // Debug
           imageDownloadUrl = await storageRepo.uploadProfileImageWeb(
-            path: imageWebBytes,
+            fileBytes: imageWebBytes,
             fileName: uid,
           );
         }

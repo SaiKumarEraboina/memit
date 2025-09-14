@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:video_trimmer/video_trimmer.dart';
 
 class TrimmerView extends StatefulWidget {
@@ -42,7 +43,7 @@ class _TrimmerViewState extends State<TrimmerView> {
         setState(() => _progressVisibility = false);
         debugPrint('OUTPUT PATH: $outputPath');
 
-        Navigator.pop(context, outputPath); // ⬅️ send the path back
+        context.pop(File(outputPath!));
       },
     );
   }
@@ -54,7 +55,7 @@ class _TrimmerViewState extends State<TrimmerView> {
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
-          title: const Text('Video Trimmer'),
+          automaticallyImplyLeading: false,
           actions: [
             IconButton(
               onPressed: _progressVisibility ? null : () => _saveVideo(),
@@ -75,7 +76,6 @@ class _TrimmerViewState extends State<TrimmerView> {
                     backgroundColor: Colors.red,
                   ),
                 ),
-
                 Expanded(child: VideoViewer(trimmer: _trimmer)),
                 Center(
                   child: Padding(
@@ -97,24 +97,23 @@ class _TrimmerViewState extends State<TrimmerView> {
                       ),
                       onChangeStart: (value) => _startValue = value,
                       onChangeEnd: (value) => _endValue = value,
-                      onChangePlaybackState:
-                          (value) => setState(() => _isPlaying = value),
+                      onChangePlaybackState: (value) =>
+                          setState(() => _isPlaying = value),
                     ),
                   ),
                 ),
                 TextButton(
-                  child:
-                      _isPlaying
-                          ? const Icon(
-                            Icons.pause,
-                            size: 80.0,
-                            color: Colors.white,
-                          )
-                          : const Icon(
-                            Icons.play_arrow,
-                            size: 80.0,
-                            color: Colors.white,
-                          ),
+                  child: _isPlaying
+                      ? const Icon(
+                          Icons.pause,
+                          size: 80.0,
+                          color: Colors.white,
+                        )
+                      : const Icon(
+                          Icons.play_arrow,
+                          size: 80.0,
+                          color: Colors.white,
+                        ),
                   onPressed: () async {
                     bool playbackState = await _trimmer.videoPlaybackControl(
                       startValue: _startValue,
