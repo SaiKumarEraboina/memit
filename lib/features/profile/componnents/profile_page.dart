@@ -8,6 +8,7 @@ import 'package:memit/features/posts/domain/entities/post.dart';
 import 'package:memit/features/posts/presentation/cubit/post_cubit.dart';
 import 'package:memit/features/posts/presentation/cubit/post_states.dart';
 import 'package:memit/features/profile/componnents/edit_proofile_page.dart';
+import 'package:memit/features/profile/componnents/user_posts_screen.dart';
 import 'package:memit/features/profile/cubit/profile_cubit.dart';
 import 'package:memit/features/profile/cubit/profile_state.dart';
 import 'package:cached_network_image/cached_network_image.dart' as cached;
@@ -222,37 +223,47 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           itemCount: posts.length,
                           itemBuilder: (context, index) {
-                            if (posts[index].imageUrl.isEmpty &&
-                                posts[index].mediaType == 'image') {
-                              return Container(
-                                color: Colors.grey[300],
-                                child: Center(
-                                  child: Icon(Icons.image_not_supported),
-                                ),
-                              );
-                            }
                             final post = posts[index];
-                            if (post.mediaType == 'image') {
-                              return CachedNetworkImage(
-                                imageUrl: post.imageUrl,
-                                fit: BoxFit.cover,
-                                errorWidget: (context, url, error) {
-                                  return Container(
-                                    color: Colors.grey[300],
-                                    child: Center(
-                                      child: Icon(Icons.image_not_supported),
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserPostsScreen(
+                                      userId: currentUser!.uid,
+                                      userName: currentUser!.name,
+                                      initialIndex: index,
                                     ),
-                                  );
-                                },
-                              );
-                            } else {
-                              return Container(
-                                color: Colors.grey[300],
-                                child: Center(
-                                  child: Icon(Icons.videocam),
-                                ),
-                              );
-                            }
+                                  ),
+                                );
+                              },
+                              child: post.imageUrl.isEmpty && post.mediaType == 'image'
+                                  ? Container(
+                                      color: Colors.grey[300],
+                                      child: Center(
+                                        child: Icon(Icons.image_not_supported),
+                                      ),
+                                    )
+                                  : post.mediaType == 'image'
+                                      ? CachedNetworkImage(
+                                          imageUrl: post.imageUrl,
+                                          fit: BoxFit.cover,
+                                          errorWidget: (context, url, error) {
+                                            return Container(
+                                              color: Colors.grey[300],
+                                              child: Center(
+                                                child: Icon(Icons.image_not_supported),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      : Container(
+                                          color: Colors.grey[300],
+                                          child: Center(
+                                            child: Icon(Icons.videocam),
+                                          ),
+                                        ),
+                            );
                           },
                         ),
                       );
