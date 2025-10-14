@@ -21,8 +21,8 @@ class PostTile extends StatefulWidget {
 }
 
 class _PostTileState extends State<PostTile> {
-  late final postCubit = context.read<PostCubit>();
-  late final profileCubit = context.read<ProfileCubit>();
+  late final postCubit;
+  late final profileCubit;
   bool isOwnPost = false;
   AppUser? currentUser;
   ProfileUser? postUser;
@@ -33,6 +33,8 @@ class _PostTileState extends State<PostTile> {
   @override
   void initState() {
     super.initState();
+    postCubit = context.read<PostCubit>();
+    profileCubit = context.read<ProfileCubit>();
     getCurrentUser();
     fetchPostUser();
     _checkIfVideo();
@@ -249,7 +251,7 @@ class _PostTileState extends State<PostTile> {
                   errorWidget: (context, url, error) => Container(
                     height: 400,
                     color: Colors.grey[200],
-                    child: const Icon(Icons.error, size: 40),
+                    child: Icon(Icons.image_not_supported, size: 40),
                   ),
                   placeholder: (context, url) => Container(
                     height: 400,

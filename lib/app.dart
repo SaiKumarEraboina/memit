@@ -13,35 +13,33 @@ import 'package:memit/routing/router.dart';
 import 'package:memit/themes/lignt_mode.dart';
 
 class MyApp extends StatelessWidget {
-  final firebaseAuthRepo = FirebaseAuthRepo();
-  final firebaseProfileRepo = FirebaseProfileRepo();
-  final firebaseStorageRepo = FirebaseStorageRepo();
-  final firebasePostRepo = FirebasePostRepo();
+  const MyApp({super.key});
 
-  MyApp({super.key});
+  static final _firebaseAuthRepo = FirebaseAuthRepo();
+  static final _firebaseProfileRepo = FirebaseProfileRepo();
+  static final _firebaseStorageRepo = FirebaseStorageRepo();
+  static final _firebasePostRepo = FirebasePostRepo();
+  static final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthCubit>(
-          create:
-              (context) => AuthCubit(authRepo: firebaseAuthRepo)..checkAuth(),
+          create: (context) =>
+              AuthCubit(authRepo: _firebaseAuthRepo)..checkAuth(),
         ),
         BlocProvider<ProfileCubit>(
-          create:
-              (context) => ProfileCubit(
-                profileRepo: firebaseProfileRepo,
-                storageRepo: firebaseStorageRepo,
-              ),
+          create: (context) => ProfileCubit(
+            profileRepo: _firebaseProfileRepo,
+            storageRepo: _firebaseStorageRepo,
+          ),
         ),
-
         BlocProvider<PostCubit>(
-          create:
-              (context) => PostCubit(
-                postRepo: firebasePostRepo,
-                storageRepo: firebaseStorageRepo,
-              ),
+          create: (context) => PostCubit(
+            postRepo: _firebasePostRepo,
+            storageRepo: _firebaseStorageRepo,
+          ),
         ),
       ],
       child: MaterialApp(
@@ -50,7 +48,7 @@ class MyApp extends StatelessWidget {
         home: BlocConsumer<AuthCubit, AuthStates>(
           builder: (context, state) {
             if (state is AuthenticatedState) {
-              return AppRouter();
+              return _appRouter;
             }
             if (state is UnAuthenticatedState) {
               return const AuthPage();
@@ -72,6 +70,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-

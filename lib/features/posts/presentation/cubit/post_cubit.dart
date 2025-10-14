@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:memit/features/posts/domain/entities/comment.dart';
 import 'package:memit/features/posts/domain/entities/post.dart';
@@ -12,6 +14,16 @@ class PostCubit extends Cubit<PostStates> {
 
   PostCubit({required this.postRepo, required this.storageRepo})
       : super(PostsInitialState());
+
+  List<Post> postList = [];
+
+  int getUserPostsCount() {
+    return postList
+        .where((element) =>
+            element.userId == FirebaseAuth.instance.currentUser?.uid)
+        .toList()
+        .length;
+  }
 
   Future<void> createPost(
     Post post, {
@@ -53,6 +65,7 @@ class PostCubit extends Cubit<PostStates> {
     try {
       emit(PostsLoadingState());
       final allPosts = await postRepo.fetchAllPosts();
+      postList = allPosts;
       emit(PostsLoadedState(posts: allPosts));
     } catch (e) {
       emit(PostsErrorState(error: e.toString()));
